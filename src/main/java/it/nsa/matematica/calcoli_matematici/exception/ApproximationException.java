@@ -1,10 +1,13 @@
 package it.nsa.matematica.calcoli_matematici.exception;
 
+import lombok.Getter;
+
 import java.math.BigInteger;
 
 /**
  * Eccezione personalizzata per indicare un'approssimazione durante il calcolo.
  */
+@Getter
 public class ApproximationException extends RuntimeException {
 
     private final BigInteger approximation;
@@ -18,14 +21,5 @@ public class ApproximationException extends RuntimeException {
     public ApproximationException(String message, BigInteger approximation) {
         super(message);
         this.approximation = approximation;
-    }
-
-    /**
-     * Restituisce il valore approssimato calcolato.
-     *
-     * @return Il valore approssimato.
-     */
-    public BigInteger getApproximation() {
-        return approximation;
     }
 }
