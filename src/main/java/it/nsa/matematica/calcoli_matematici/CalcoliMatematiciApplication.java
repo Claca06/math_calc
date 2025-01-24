@@ -1,15 +1,17 @@
 //package it.nsa.matematica.calcoli_matematici;
+
 //
 //import org.springframework.boot.autoconfigure.SpringBootApplication;
 //
 //import java.math.BigInteger;
+//import java.lang.Integer;
 //
 //import static it.nsa.matematica.calcoli_matematici.type.Integer.*;
-//
+
 //@SpringBootApplication
 //public class CalcoliMatematiciApplication {
 //
-
+//
 //
 //    public static void main(String[] args) {
 //        BigInteger result;
@@ -33,7 +35,7 @@
 //        System.out.println("minimum of: " + result);
 //        result = squareRootOf(64L);
 //        System.out.println("square root of:" + result);
-//        result = resultOfFibonacciIterations(25L);
+//        result = resultOfForFibonacciIterations(25L, 8);
 //        System.out.println("result of fibonacci iterations: " + result);
 //    }
 //}

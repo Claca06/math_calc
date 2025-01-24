@@ -1,7 +1,7 @@
 package it.nsa.matematica.calcoli_matematici.type;
 
-import it.nsa.matematica.calcoli_matematici.exception.MathOperationException;
 import it.nsa.matematica.calcoli_matematici.exception.ApproximationException;
+import it.nsa.matematica.calcoli_matematici.exception.MathOperationException;
 
 import java.math.BigInteger;
 
@@ -151,21 +151,22 @@ public class Integer {
     /**
      * Calcola il risultato della sequenza di Fibonacci fino all'iterazione specificata.
      *
-     * @param value L'iterazione per cui calcolare la sequenza di Fibonacci. Deve essere maggiore o uguale a zero.
+     * @param startingNumber     L'iterazione per cui calcolare la sequenza di Fibonacci. Deve essere maggiore o uguale a zero.
+     * @param numberOfIterations Il numero di iterazioni fibonacci che il metodo calcolerà dal numero di partenza.
      * @return Il valore della sequenza di Fibonacci come {@link BigInteger}.
      * @throws MathOperationException Se il valore fornito è negativo.
      */
-    public static BigInteger resultOfFibonacciIterations(Long value) {
-        checkNegative(value);
+    public static BigInteger resultOfForFibonacciIterations(Long startingNumber, java.lang.Integer numberOfIterations) {
+        checkNegative(startingNumber);
 
-        BigInteger a = ZERO;
-        BigInteger b = ONE;
+        BigInteger a = BigInteger.valueOf(startingNumber);
+        BigInteger b = BigInteger.valueOf(startingNumber).multiply(BigInteger.valueOf(8)).divide(BigInteger.valueOf(5));
 
-        if (value == 1) {
+        if (startingNumber == 1) {
             return b;
         }
 
-        for (int i = 2; i <= value; i++) {
+        for (int i = 2; i <= numberOfIterations; i++) {
             BigInteger temp = a;
             a = b;
             b = temp.add(b);
