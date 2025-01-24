@@ -3,7 +3,9 @@ package it.nsa.matematica.calcoli_matematici.type;
 import it.nsa.matematica.calcoli_matematici.exception.ApproximationException;
 import it.nsa.matematica.calcoli_matematici.exception.MathOperationException;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static it.nsa.matematica.calcoli_matematici.utility.Utility.*;
 
@@ -14,6 +16,7 @@ public class Integer {
 
     private static final BigInteger ONE = BigInteger.ONE;
     private static final BigInteger ZERO = BigInteger.ZERO;
+    private static final BigInteger HUNDRED = BigInteger.valueOf(100);
 
     /**
      * Calcola la somma di tutti i valori forniti.
@@ -147,6 +150,133 @@ public class Integer {
 
         throw new ApproximationException("Il numero non è un quadrato perfetto. Approssimazione: " + a, a);
     }
+
+    /**
+     * Calcola il fattoriale del valore fornito.
+     *
+     * @param value Il valore di cui calcolare il fattoriale. Deve essere maggiore o uguale a zero.
+     * @return Il fattoriale del valore come {@link BigInteger}.
+     * @throws MathOperationException Se il valore fornito è negativo.
+     */
+    public static BigInteger factorialOf(Long value) {
+        checkNegative(value);
+
+        BigInteger result = ONE;
+        for (long i = 1; i <= value; i++) {
+            result = result.multiply(BigInteger.valueOf(i));
+        }
+
+        return result;
+    }
+
+    /**
+     * Calcola il valore minimo tra quelli forniti.
+     *
+     * @param values I valori tra cui trovare il minimo. Devono contenere almeno un elemento e non devono essere null.
+     * @return Il valore minimo come {@link BigInteger}.
+     * @throws MathOperationException Se i valori sono null o vuoti.
+     */
+    public static BigInteger minimumOf(Long... values) {
+        checkLength(values);
+        checkValues(values);
+
+        BigInteger min = BigInteger.valueOf(values[0]);
+        for (Long value : values) {
+            BigInteger current = BigInteger.valueOf(value);
+            if (current.compareTo(min) < 0) {
+                min = current;
+            }
+        }
+
+        return min;
+    }
+
+
+    /**
+     * Calcola il valore massimo tra quelli forniti.
+     *
+     * @param values I valori tra cui trovare il massimo. Devono contenere almeno un elemento e non devono essere null.
+     * @return Il valore massimo come {@link BigInteger}.
+     * @throws MathOperationException Se i valori sono null o vuoti.
+     */
+    public static BigInteger maximumOf(Long... values) {
+        checkLength(values);
+        checkValues(values);
+
+        BigInteger max = BigInteger.valueOf(values[0]);
+        for (Long value : values) {
+            BigInteger current = BigInteger.valueOf(value);
+            if (current.compareTo(max) > 0) {
+                max = current;
+            }
+        }
+
+        return max;
+    }
+
+    /**
+     * Calcola la media aritmetica dei valori forniti.
+     *
+     * @param values I valori di cui calcolare la media. Devono contenere almeno un elemento e non devono essere null.
+     * @return La media aritmetica come {@link BigInteger} (arrotondata per difetto).
+     * @throws MathOperationException Se i valori sono null o vuoti.
+     */
+    public static BigInteger averageOf(Long... values) {
+        checkLength(values);
+        checkValues(values);
+
+        BigInteger sum = ZERO;
+        for (Long value : values) {
+            sum = sum.add(BigInteger.valueOf(value));
+        }
+
+        return sum.divide(BigInteger.valueOf(values.length));
+    }
+
+    /**
+     * Calcola il risultato della division dei valori forniti per un certo numero.
+     *
+     * @param prcntVal Valore intero rappresentativo della percentuale.
+     * @param total    Valore totale da cui calcolare la percentuale.
+     * @return Il risultato della division come {@link BigInteger}
+     * @throws MathOperationException Se i valori sono negativi.
+     */
+    public static BigInteger percentOf(Long prcntVal, Long total) {
+        checkNegative(total);
+        checkNegative(prcntVal);
+        return BigInteger.valueOf(prcntVal).multiply(BigInteger.valueOf(total)).divide(HUNDRED);
+    }
+
+    /**
+     * Calcola il risultato percentuale di un valore rispetto al totale, approssimando correttamente.
+     * L'approssimazione avviene arrotondando per eccesso dal .5 in su e per difetto sotto .5.
+     *
+     * @param total Valore totale da cui calcolare la percentuale.
+     * @param part Valore parte del totale, poi tradotto in valore percentuale.
+     * @return Il risultato percentuale come {@link BigInteger}, arrotondato correttamente.
+     * @throws MathOperationException Se i valori sono negativi o se il totale è zero.
+     */
+    /**
+     * Calcola il risultato percentuale di una parte rispetto al totale,
+     * approssimando per eccesso dal .5 in su e per difetto sotto il .5.
+     *
+     * @param total Valore totale da cui calcolare la percentuale.
+     * @param part  Valore parte del totale, poi tradotto in valore percentuale.
+     * @return Il risultato della percentuale come {@link BigInteger}.
+     * @throws MathOperationException Se i valori sono negativi o il totale è zero.
+     */
+    public static BigInteger percentageOf(Long total, Long part) {
+        checkZeroValue(total);
+        checkNegative(total);
+        checkNegative(part);
+
+        BigDecimal rawPercentage = BigDecimal.valueOf(part)
+                .divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        return rawPercentage.setScale(0, RoundingMode.HALF_UP).toBigInteger();
+    }
+
 
     /**
      * Calcola il risultato della sequenza di Fibonacci fino all'iterazione specificata.

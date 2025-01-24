@@ -15,8 +15,8 @@ public class ApproximationException extends RuntimeException {
     /**
      * Costruttore per creare l'eccezione con un messaggio personalizzato e un valore approssimato.
      *
-     * @param message        Il messaggio che descrive l'errore.
-     * @param approximation  Il valore approssimato calcolato.
+     * @param message       Il messaggio che descrive l'errore.
+     * @param approximation Il valore approssimato calcolato.
      */
     public ApproximationException(String message, BigInteger approximation) {
         super(message);
