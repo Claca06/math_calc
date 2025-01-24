@@ -9,9 +9,7 @@
 //@SpringBootApplication
 //public class CalcoliMatematiciApplication {
 //
-//	public static void main(String[] args) {
-//		SpringApplication.run(CalcoliMatematiciApplication.class, args);
-//	}
+
 //
 //    public static void main(String[] args) {
 //        BigInteger result;
