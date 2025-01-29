@@ -1,59 +1,38 @@
 package it.nsa.matematica.calcoli_matematici.utility;
 
-import it.nsa.matematica.calcoli_matematici.exception.MathOperationException;
-
 /**
  * Classe di utility per eseguire controlli sui parametri forniti alle operazioni matematiche.
  */
 public class Utility {
 
     /**
-     * Verifica che l'array fornito contenga almeno due elementi.
+     * Costruisce un messaggio sostituendo i segnaposto "{}" con i parametri forniti.
+     * * @param message Il messaggio con segnaposto "{}".
      *
-     * @param values L'array di valori da controllare.
-     * @throws MathOperationException Se l'array è nullo o contiene meno di due elementi.
+     * @param params Gli oggetti da sostituire nei segnaposto.
+     * @return Il messaggio costruito.
      */
-    public static void checkLength(Long[] values) {
-        if (values == null || values.length < 2) {
-            throw new MathOperationException("L'array deve contenere almeno due elementi.");
+    public static String buildMessage(String message, Object... params) {
+        if (message == null || params == null || params.length == 0) {
+            return message;
         }
-    }
-
-    /**
-     * Verifica che l'array non contenga valori null.
-     *
-     * @param values L'array di valori da controllare.
-     * @throws MathOperationException Se l'array contiene valori null.
-     */
-    public static void checkValues(Long[] values) {
-        for (Long value : values) {
-            if (value == null) {
-                throw new MathOperationException("L'array non deve contenere valori null.");
+        StringBuilder result = new StringBuilder();
+        int placeholderIndex = 0;
+        int paramIndex = 0;
+        while (placeholderIndex < message.length()) {
+            int nextPlaceholder = message.indexOf("{}", placeholderIndex);
+            if (nextPlaceholder == -1) {
+                result.append(message.substring(placeholderIndex));
+                break;
             }
+            result.append(message, placeholderIndex, nextPlaceholder);
+            if (paramIndex < params.length) {
+                result.append(params[paramIndex++]);
+            } else {
+                result.append("{}");
+            }
+            placeholderIndex = nextPlaceholder + 2;
         }
-    }
-
-    /**
-     * Verifica che il valore fornito non sia zero.
-     *
-     * @param value Il valore da controllare.
-     * @throws MathOperationException Se il valore è zero.
-     */
-    public static void checkZeroValue(Long value) {
-        if (value == 0) {
-            throw new MathOperationException("Il valore non può essere zero.");
-        }
-    }
-
-    /**
-     * Verifica che il valore fornito non sia negativo.
-     *
-     * @param value Il valore da controllare.
-     * @throws MathOperationException Se il valore è negativo.
-     */
-    public static void checkNegative(Long value) {
-        if (value < 0) {
-            throw new MathOperationException("Il valore non può essere negativo.");
-        }
+        return result.toString();
     }
 }

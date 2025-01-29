@@ -4,47 +4,47 @@ import it.nsa.matematica.calcoli_matematici.utility.SafeExecutor;
 
 import java.math.BigInteger;
 
-import static it.nsa.matematica.calcoli_matematici.type.Integer.*;
+import static it.nsa.matematica.calcoli_matematici.type.IntegerUtils.*;
+import static it.nsa.matematica.calcoli_matematici.utility.Utility.buildMessage;
 
 public class CalcoliMatematiciApplicationTest {
     public static void main(String[] args) {
         // Variabili per i calcoli
-        Long[] valuesForSum = {4L, 7L};
-        Long[] valuesForProduct = {3L, 7L};
+        Long[] valuesForSum = {4L, 7L, 19L};
+        Long[] valuesForProduct = {3L, 7L, 5L};
         Long valueForFactorial = 5L;
         Long[] valuesForDifference = {8L, 6L, 3L, 5L, 8L};
-        Long[] valuesForDivision = {12L, 6L, 2L};
+        Long[] valuesForDivision = {200L, 10L, 5L, 2L};
         Long[] valuesForSumOfSquares = {3L, 6L, 2L};
         Long[] valuesForAverage = {3L, 6L, 5L, 2L};
         Long[] valuesForMaximum = {-50L, 6L, -12L, 3L, 0L};
         Long[] valuesForMinimum = {-50L, 6L, 12L, 3L, 0L};
         Long percentageForPercent = 65L;
         Long totalForPercent = 400L;
-        Long valueForSquareRoot = 63L;
-        Long valueForFibonacci = 25L;
-        int fibonacciIterations = 8;
+        Long valueForSquareRoot = 81L;
+        int fibonacciIterations = 7;
 
         // Esecuzione e stampa dei risultati
-        executeAndPrint(() -> sumOf(valuesForSum), "sum of " + arrayToString(valuesForSum));
-        executeAndPrint(() -> productOf(valuesForProduct), "product of " + arrayToString(valuesForProduct));
-        executeAndPrint(() -> factorialOf(valueForFactorial), "factorial of " + valueForFactorial);
-        executeAndPrint(() -> differenceOf(valuesForDifference), "difference of " + arrayToString(valuesForDifference));
-        executeAndPrint(() -> divisionOf(valuesForDivision), "division of " + arrayToString(valuesForDivision));
-        executeAndPrint(() -> sumOfSquaresOf(valuesForSumOfSquares), "sum of squares of " + arrayToString(valuesForSumOfSquares));
-        executeAndPrint(() -> averageOf(valuesForAverage), "average of " + arrayToString(valuesForAverage));
-        executeAndPrint(() -> percentOf(percentageForPercent, totalForPercent), percentageForPercent + "% of " + totalForPercent);
-        executeAndPrint(() -> percentageOf(totalForPercent, percentageForPercent), percentageForPercent + "parts of " + totalForPercent);
-        executeAndPrint(() -> maximumOf(valuesForMaximum), "maximum of " + arrayToString(valuesForMaximum));
-        executeAndPrint(() -> minimumOf(valuesForMinimum), "minimum of " + arrayToString(valuesForMinimum));
-        executeAndPrint(() -> squareRootOf(valueForSquareRoot), "square root of " + valueForSquareRoot);
-        executeAndPrint(() -> resultOfForFibonacciIterations(valueForFibonacci, fibonacciIterations),
-                "result of fibonacci iterations starting from " + valueForFibonacci + " with " + fibonacciIterations + " iterations");
+        executeAndPrint(() -> sumOf(valuesForSum), buildMessage("sumOf {} ", arrayToString(valuesForSum)));
+        executeAndPrint(() -> productOf(valuesForProduct), buildMessage("productOf {}", arrayToString(valuesForProduct)));
+        executeAndPrint(() -> differenceOf(valuesForDifference), buildMessage("differenceOf {}", arrayToString(valuesForDifference)));
+        executeAndPrint(() -> divisionOf(valuesForDivision), buildMessage("divisionOf {}", arrayToString(valuesForDivision)));
+        executeAndPrint(() -> sumOfSquaresOf(valuesForSumOfSquares), buildMessage("sumOfSquaresOf {}", arrayToString(valuesForSumOfSquares)));
+        executeAndPrint(() -> averageOf(valuesForAverage), buildMessage("averageOf {}", arrayToString(valuesForAverage)));
+        executeAndPrint(() -> maximumOf(valuesForMaximum), buildMessage("maximumOf {}", arrayToString(valuesForMaximum)));
+        executeAndPrint(() -> minimumOf(valuesForMinimum), buildMessage("minimumOf {}", arrayToString(valuesForMinimum)));
+        executeAndPrint(() -> factorialOf(valueForFactorial), buildMessage("factorialOf {}", valueForFactorial));
+        executeAndPrint(() -> percentOf(totalForPercent, percentageForPercent), buildMessage("{}% of {}", percentageForPercent, totalForPercent));
+        executeAndPrint(() -> percentageOf(totalForPercent, percentageForPercent), buildMessage("percentageOf {} over {}", percentageForPercent, totalForPercent));
+        executeAndPrint(() -> squareRootOf(valueForSquareRoot), buildMessage("squareRootOf {}", valueForSquareRoot));
+        executeAndPrint(() -> resultOfForFibonacciIterations(fibonacciIterations),
+                buildMessage("{} fibonacciIterations", fibonacciIterations));
     }
 
     // Metodo generico per eseguire un'operazione e stampare il risultato
     private static void executeAndPrint(SafeExecutor.Operation operation, String description) {
         BigInteger result = SafeExecutor.execute(operation);
-        System.out.println(description + ": " + result);
+        System.out.println(buildMessage("Risultato per {} = {}", description, result));
     }
 
     // Metodo per convertire un array in stringa leggibile
