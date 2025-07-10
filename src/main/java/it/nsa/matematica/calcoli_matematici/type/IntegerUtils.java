@@ -5,215 +5,227 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Stream;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.*;
 
 /**
- * Classe per eseguire operazioni matematiche su numeri interi rappresentati come {@link BigInteger}.
+ * Classe di utility per operazioni matematiche su numeri interi rappresentati come {@link BigInteger}.
+ * <p>
+ * Tutti i metodi restituiscono {@link BigInteger#ZERO} se i parametri in input sono nulli, insufficienti
+ * o non validi secondo il minimo richiesto.
  */
 public class IntegerUtils {
 
-    private static final BigInteger HUNDRED = BigInteger.valueOf(100);
+    private static final BigInteger HUNDRED = TEN.multiply(TEN);
 
     /**
      * Calcola la somma di tutti i valori forniti.
      *
-     * @param values I valori da sommare. Devono contenere almeno due elementi e non devono essere null.
-     * @return La somma di tutti i valori come {@link BigInteger}.
+     * @param values I valori da sommare. Devono contenere almeno 2 elementi non nulli.
+     * @return La somma come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger sumOf(Long... values) {
-        return Optional.of(values)
-                .map(_values -> Arrays.stream(_values)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce(ZERO, BigInteger::add)
-                )
-                .orElse(ZERO);
-
+        if (!isValid(values, 2)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce(ZERO, BigInteger::add);
     }
 
     /**
-     * Calcola la differenza dei valori forniti in ordine di inserimento.
+     * Calcola la differenza dei valori in ordine di inserimento (x1 - x2 - x3 ...).
      *
-     * @param values I valori da cui calcolare la differenza. Devono contenere almeno due elementi e non devono essere null.
-     * @return La differenza tra i valori come {@link BigInteger}.
+     * @param values I valori da cui calcolare la differenza. Devono contenere almeno 2 elementi non nulli.
+     * @return La differenza come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger differenceOf(Long... values) {
-        return Optional.of(values)
-                .map(_values -> Arrays.stream(_values)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce(ZERO, BigInteger::subtract)
-                )
+        if (!isValid(values, 2)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce((a, b) -> a.subtract(b))
                 .orElse(ZERO);
     }
 
     /**
      * Calcola il prodotto di tutti i valori forniti.
      *
-     * @param values I valori da moltiplicare. Devono contenere almeno due elementi e non devono essere null.
-     * @return Il prodotto di tutti i valori come {@link BigInteger}.
+     * @param values I valori da moltiplicare. Devono contenere almeno 2 elementi non nulli.
+     * @return Il prodotto come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger productOf(Long... values) {
-        return Optional.of(values)
-                .map(_values -> Arrays.stream(_values)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce(ONE, BigInteger::multiply)
-                )
+        if (!isValid(values, 2)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce(ONE, BigInteger::multiply);
+    }
+
+    /**
+     * Calcola la divisione sequenziale dei valori (x1 / x2 / x3 ...).
+     * Se un divisore è zero o la divisione non è intera, restituisce ZERO.
+     *
+     * @param values I valori da dividere. Devono contenere almeno 2 elementi non nulli.
+     * @return Il risultato come {@link BigInteger}, o ZERO se input non valido.
+     */
+    public static BigInteger divisionOf(Long... values) {
+        if (!isValid(values, 2)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce((acc, current) -> {
+                    if (current.equals(ZERO) || !acc.mod(current).equals(ZERO)) {
+                        return ZERO;
+                    }
+                    return acc.divide(current);
+                })
                 .orElse(ZERO);
     }
 
     /**
-     * Calcola la divisione dei valori forniti in ordine di inserimento.
+     * Calcola la somma dei quadrati dei valori forniti.
      *
-     * @param values I valori da dividere. Devono contenere almeno due elementi e non devono essere null.
-     * @return Il risultato della divisione come {@link BigInteger}.
+     * @param values I valori da elevare al quadrato. Devono contenere almeno 1 elemento non nullo.
+     * @return La somma dei quadrati come {@link BigInteger}, o ZERO se input non valido.
      */
-    public static BigInteger divisionOf(Long... values) {
-        return Optional.ofNullable(values)
-                .filter(v -> v.length >= 2)
-                .map(v -> Arrays.stream(v)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce((acc, current) -> {
-                            if (current.equals(ZERO)) {
-                                return ZERO;
-                            }
-                            if (!acc.mod(current).equals(ZERO)) {
-                                return ZERO;
-                            }
-                            return acc.divide(current);
-                        })
-                        .orElse(ZERO)
-                )
-                .orElse(ZERO);
-    }
-
     public static BigInteger sumOfSquaresOf(Long... values) {
-        return Arrays.stream(values)
-                .filter(Objects::nonNull)
-                .map(value -> BigInteger.valueOf(value).pow(2))
+        if (!isValid(values, 1)) return ZERO;
+        return toBigIntegerStream(values)
+                .map(v -> v.pow(2))
                 .reduce(ZERO, BigInteger::add);
     }
 
     /**
-     * Calcola la radice quadrata intera del valore fornito.
+     * Calcola la radice quadrata intera (troncata) del valore fornito.
      *
-     * @param value Il valore di cui calcolare la radice quadrata. Deve essere maggiore di zero.
-     * @return La radice quadrata intera come {@link BigInteger}.
+     * @param value Il valore di cui calcolare la radice. Deve essere non nullo.
+     * @return La radice quadrata troncata come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger squareRootOf(Long value) {
+        if (!isValid(value)) return ZERO;
         return BigInteger.valueOf(value).sqrt();
     }
 
     /**
      * Calcola il fattoriale del valore fornito.
      *
-     * @param value Il valore di cui calcolare il fattoriale. Deve essere maggiore o uguale a zero.
-     * @return Il fattoriale del valore come {@link BigInteger}.
+     * @param value Il valore di cui calcolare il fattoriale. Deve essere non nullo e >= 0.
+     * @return Il fattoriale come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger factorialOf(Long value) {
+        if (!isValid(value) || value < 0) return ZERO;
         BigInteger result = ONE;
         for (long i = 1; i <= value; i++) {
             result = result.multiply(BigInteger.valueOf(i));
         }
-
         return result;
     }
 
     /**
-     * Calcola il valore minimo tra quelli forniti.
+     * Restituisce il valore minimo tra quelli forniti.
      *
-     * @param values I valori tra cui trovare il minimo. Devono contenere almeno un elemento e non devono essere null.
-     * @return Il valore minimo come {@link BigInteger}.
+     * @param values I valori tra cui trovare il minimo. Devono contenere almeno 1 elemento non nullo.
+     * @return Il minimo come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger minimumOf(Long... values) {
-
-        return Optional.of(values)
-                .map(_values -> Arrays.stream(_values)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce(ONE, BigInteger::min)
-                )
+        if (!isValid(values, 1)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce(BigInteger::min)
                 .orElse(ZERO);
     }
 
-
     /**
-     * Calcola il valore massimo tra quelli forniti.
+     * Restituisce il valore massimo tra quelli forniti.
      *
-     * @param values I valori tra cui trovare il massimo. Devono contenere almeno un elemento e non devono essere null.
-     * @return Il valore massimo come {@link BigInteger}.
+     * @param values I valori tra cui trovare il massimo. Devono contenere almeno 1 elemento non nullo.
+     * @return Il massimo come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger maximumOf(Long... values) {
-        return Optional.of(values)
-                .map(_values -> Arrays.stream(_values)
-                        .filter(Objects::nonNull)
-                        .map(BigInteger::valueOf)
-                        .reduce(ONE, BigInteger::max)
-                )
+        if (!isValid(values, 1)) return ZERO;
+        return toBigIntegerStream(values)
+                .reduce(BigInteger::max)
                 .orElse(ZERO);
     }
 
     /**
-     * Calcola la media aritmetica dei valori forniti.
+     * Calcola la media aritmetica dei valori forniti (arrotondata per difetto).
      *
-     * @param values I valori di cui calcolare la media. Devono contenere almeno un elemento e non devono essere null.
-     * @return La media aritmetica come {@link BigInteger} (arrotondata per difetto).
+     * @param values I valori da mediare. Devono contenere almeno 1 elemento non nullo.
+     * @return La media come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger averageOf(Long... values) {
+        if (!isValid(values, 1)) return ZERO;
         return sumOf(values).divide(BigInteger.valueOf(values.length));
     }
 
     /**
-     * Calcola il risultato della division dei valori forniti per un certo numero.
+     * Calcola il percentuale intero di un valore rispetto a 100.
      *
-     * @param total    Valore totale da cui calcolare la percentuale.
-     * @param prcntVal Valore intero rappresentativo della percentuale.
-     * @return Il risultato della division come {@link BigInteger}
+     * @param total    Valore totale. Deve essere non nullo.
+     * @param prcntVal Il valore percentuale. Se nullo, trattato come ZERO.
+     * @return Il risultato come {@link BigInteger}, o ZERO se total non valido.
      */
     public static BigInteger percentOf(Long total, Long prcntVal) {
-        return BigInteger.valueOf(prcntVal).multiply(BigInteger.valueOf(total)).divide(HUNDRED);
+        if (!isValid(total)) return ZERO;
+        BigInteger percent = prcntVal != null ? BigInteger.valueOf(prcntVal) : ZERO;
+        return BigInteger.valueOf(total)
+                .divide(HUNDRED)
+                .multiply(percent);
     }
 
     /**
-     * Calcola il risultato percentuale di una parte rispetto al totale,
-     * approssimando per eccesso dal .5 in su e per difetto sotto il .5.
+     * Calcola la percentuale di part rispetto al totale,
+     * arrotondando dal .5 in su per eccesso e sotto .5 per difetto.
      *
-     * @param total Valore totale da cui calcolare la percentuale.
-     * @param part  Valore parte del totale, poi tradotto in valore percentuale.
-     * @return Il risultato della percentuale come {@link BigInteger}.
+     * @param total Valore totale. Deve essere non nullo e >0.
+     * @param part  Valore parte. Deve essere non nullo e >=0.
+     * @return Il risultato come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger percentageOf(Long total, Long part) {
-
-        return BigDecimal.valueOf(part)
-                .divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100))
-                .setScale(0, RoundingMode.HALF_UP).toBigInteger();
-
+        if (!isValid(total) || total == 0 || !isValid(part) || part < 0) return ZERO;
+        BigDecimal totDec = BigDecimal.valueOf(total);
+        BigDecimal partDec = BigDecimal.valueOf(part);
+        return partDec
+                .divide(totDec, 2, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal(HUNDRED))
+                .setScale(0, RoundingMode.HALF_UP)
+                .toBigInteger();
     }
 
-
     /**
-     * Calcola il risultato della sequenza di Fibonacci fino all'iterazione specificata.
+     * Calcola il valore di Fibonacci per il numero di iterazioni specificato partendo da 0.
      *
-     * @param numberOfIterations Il numero di iterazioni fibonacci che il metodo calcolerà dal numero di partenza.
-     * @return Il valore della sequenza di Fibonacci come {@link BigInteger}.
+     * @param numberOfIterations Il numero di passi. Deve essere non nullo e >=0.
+     * @return Il valore di Fibonacci come {@link BigInteger}, o ZERO se input non valido.
      */
     public static BigInteger resultOfForFibonacciIterations(Integer numberOfIterations) {
-
+        if (numberOfIterations == null || numberOfIterations < 0) return ZERO;
         BigInteger a = ZERO;
         BigInteger b = ONE;
-
         for (int i = 1; i <= numberOfIterations; i++) {
             BigInteger temp = a;
             a = b;
             b = temp.add(b);
         }
-
         return a;
+    }
+
+    // --- METODI AUSILIARI PRIVATI ---
+
+    /**
+     * Verifica che l'array contenga almeno minRequired valori non nulli.
+     */
+    private static boolean isValid(Long[] values, int minRequired) {
+        return values != null && toBigIntegerStream(values)
+                .count() >= minRequired;
+    }
+
+    /**
+     * Verifica che il singolo valore non sia null.
+     */
+    private static boolean isValid(Long value) {
+        return toBigIntegerStream(value).count() == 1;
+    }
+
+    /**
+     * Converte un array di Long non nulli in Stream di BigInteger.
+     */
+    private static Stream<BigInteger> toBigIntegerStream(Long... values) {
+        return Arrays.stream(values)
+                .filter(Objects::nonNull)
+                .map(BigInteger::valueOf);
     }
 }
