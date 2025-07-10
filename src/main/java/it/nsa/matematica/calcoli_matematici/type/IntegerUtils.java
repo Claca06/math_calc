@@ -63,7 +63,7 @@ public class IntegerUtils {
      * @param values I valori da dividere. Devono contenere almeno 2 elementi non nulli.
      * @return Il risultato come {@link BigInteger}, o ZERO se input non valido.
      */
-    public static BigInteger divisionOf(Long... values) {
+    public static BigInteger sequentialDivisionOf(Long... values) {
         if (!isValid(values, 2)) return ZERO;
         return toBigIntegerStream(values)
                 .reduce((acc, current) -> {
