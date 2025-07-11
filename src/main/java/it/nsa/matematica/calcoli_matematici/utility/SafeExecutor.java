@@ -2,6 +2,8 @@ package it.nsa.matematica.calcoli_matematici.utility;
 
 import java.math.BigInteger;
 
+import static it.nsa.matematica.calcoli_matematici.utility.Utility.buildMessage;
+
 /**
  * Classe utilitaria per eseguire operazioni matematiche in modo sicuro.
  * Questa classe fornisce un metodo centralizzato per eseguire operazioni
@@ -41,7 +43,7 @@ public class SafeExecutor {
             return operation.execute();
         } catch (Exception e) {
             // Gestione dell'eccezione e ritorno di un valore predefinito (es. ZERO)
-            System.err.println(e.getMessage());
+            System.err.println(buildMessage("Errore ricevuto: {}", e.getMessage()));
             return BigInteger.ZERO;
         }
     }
